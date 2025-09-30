@@ -1,6 +1,10 @@
 package br.ufpr.vibetrack.mobile;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -17,11 +21,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import br.ufpr.vibetrack.mobile.service.DataLayerListenerService;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int SENSOR_PERMISSION_REQUEST_CODE = 101;
     private TextView permissionStatusTextView;
     private Button requestPermissionButton;
+    private TextView syncStatusTextView;
+    private BroadcastReceiver syncResultReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +45,45 @@ public class MainActivity extends AppCompatActivity {
         // Inicializa os componentes da UI
         permissionStatusTextView = findViewById(R.id.permissionStatusTextView);
         requestPermissionButton = findViewById(R.id.requestPermissionButton);
+        syncStatusTextView = findViewById(R.id.syncStatusTextView);
 
         // Configura o listener do botão
         requestPermissionButton.setOnClickListener(v -> requestSensorPermission());
 
         // Verifica o status da permissão ao iniciar a tela
         checkSensorPermission();
+
+        // Configura o "receptor" para a mensagem do serviço
+        syncResultReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent != null && DataLayerListenerService.ACTION_SYNC_RESULT.equals(intent.getAction())) {
+                    boolean success = intent.getBooleanExtra(DataLayerListenerService.EXTRA_SYNC_SUCCESS, false);
+                    String message = intent.getStringExtra(DataLayerListenerService.EXTRA_SYNC_MESSAGE);
+
+                    syncStatusTextView.setText(message);
+                    if (success) {
+                        syncStatusTextView.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+                    } else {
+                        syncStatusTextView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
+                    }
+                }
+            }
+        };
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Registra o receiver para ouvir as mensagens quando a tela está visível
+        registerReceiver(syncResultReceiver, new IntentFilter(DataLayerListenerService.ACTION_SYNC_RESULT), RECEIVER_NOT_EXPORTED);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Desregistra o receiver quando a tela não está mais visível para evitar vazamentos de memória
+        unregisterReceiver(syncResultReceiver);
     }
 
     private void checkSensorPermission() {
