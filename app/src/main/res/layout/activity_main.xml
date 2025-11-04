@@ -58,4 +58,34 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
+    <Button
+        android:id="@+id/sendMockDataButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Enviar Dados de Teste para API" />
+    <EditText
+        android:id="@+id/pairingCodeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:hint="Digite o código de pareamento"
+        android:inputType="text"
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/pairButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Parear com o Sistema" />
+    <Button
+        android:id="@+id/resetButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Resetar Pareamento"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
 </LinearLayout>

@@ -20,6 +20,9 @@ public class HeartRate {
         this.max = max;
     }
 
+    public HeartRate(long l, int average) {
+    }
+
     public int getResting() {
         return resting;
     }

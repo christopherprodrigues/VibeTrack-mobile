@@ -17,7 +17,7 @@ public class ExperimentResult {
     private HealthData healthData;
 
     // Construtor, Getters e Setters
-    public ExperimentResult(String userId, String device, String date, HealthData healthData) {
+    public ExperimentResult(String userId, String device, String s, HealthData healthData) {
         this.userId = userId;
         this.device = device;
         this.date = date;
