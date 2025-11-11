@@ -1,91 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="16dp"
     tools:context=".MainActivity">
-
-    <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_launcher_foreground"
-        app:tint="?attr/colorPrimary" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="VibeTrack"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="Coleta de Dados"
-        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/permissionStatusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        tools:text="Status da Permissão de Sensores: CONCEDIDA" />
-
-    <TextView
-        android:id="@+id/syncStatusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="Aguardando dados do smartwatch..."
-        android:textAlignment="center"
-        android:textSize="14sp" />
+        android:text="Verificando permissões..."
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <Button
         android:id="@+id/requestPermissionButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Conceder Permissão"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:layout_marginTop="8dp"
+        android:text="Solicitar Permissão de Sensores"
+        android:visibility="gone" />
 
-    <Button
-        android:id="@+id/sendMockDataButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Enviar Dados de Teste para API" />
     <EditText
         android:id="@+id/pairingCodeEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:hint="Digite o código de pareamento"
-        android:inputType="text"
-        android:textAlignment="center" />
+        android:layout_marginTop="16dp"
+        android:hint="Insira o código de pareamento"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/pairButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Parear com o Sistema" />
+
     <Button
         android:id="@+id/resetButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Resetar Pareamento"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/sendMockDataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Enviar Dados de Teste (Mock)" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Status da Sincronização:"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:background="#f0f0f0"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/syncStatusTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="Aguardando dados do relógio..." />
+    </ScrollView>
 
 </LinearLayout>

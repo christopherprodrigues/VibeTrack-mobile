@@ -5,8 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences; // Import necessário
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log; // Import necessário
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,18 +36,26 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private static final int SENSOR_PERMISSION_REQUEST_CODE = 101;
+
+    // Constantes para SharedPreferences (usadas pelo Service)
+    public static final String PREFS_NAME = "VibeTrackPrefs";
+    public static final String KEY_USER_ID = "UserID";
+
+    // --- Componentes da UI ---
     private TextView permissionStatusTextView;
     private Button requestPermissionButton;
     private TextView syncStatusTextView;
-    private BroadcastReceiver syncResultReceiver;
     private Button sendMockDataButton;
     private Button resetButton;
-
-    // Variáveis para a funcionalidade de pareamento
     private EditText pairingCodeEditText;
     private Button pairButton;
-    private String currentUserId = null;
+
+    // --- Variáveis de Lógica ---
+    private SharedPreferences sharedPreferences;
+    private BroadcastReceiver syncResultReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +68,14 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Inicializa o SharedPreferences
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
         // --- Inicialização dos componentes da UI ---
         permissionStatusTextView = findViewById(R.id.permissionStatusTextView);
         requestPermissionButton = findViewById(R.id.requestPermissionButton);
         syncStatusTextView = findViewById(R.id.syncStatusTextView);
         sendMockDataButton = findViewById(R.id.sendMockDataButton);
-
-        // --- Componentes do Pareamento ---
         pairingCodeEditText = findViewById(R.id.pairingCodeEditText);
         pairButton = findViewById(R.id.pairButton);
         resetButton = findViewById(R.id.resetButton);
@@ -79,8 +90,11 @@ public class MainActivity extends AppCompatActivity {
             if (pairingCode.isEmpty()) {
                 Toast.makeText(this, "Por favor, digite um código.", Toast.LENGTH_SHORT).show();
             } else {
-                this.currentUserId = pairingCode;
-                Toast.makeText(this, "Dispositivo pareado com o código: " + this.currentUserId, Toast.LENGTH_LONG).show();
+                // Salva o ID no SharedPreferences para o Service usar
+                saveUserId(pairingCode);
+
+                // Atualiza a UI
+                Toast.makeText(this, "Dispositivo pareado com o código: " + pairingCode, Toast.LENGTH_LONG).show();
                 pairingCodeEditText.setEnabled(false);
                 pairButton.setText("Pareado");
                 pairButton.setEnabled(false);
@@ -90,54 +104,121 @@ public class MainActivity extends AppCompatActivity {
 
         // Listener para o botão de reset
         resetButton.setOnClickListener(v -> {
-            // Limpa o ID e reativa os campos
-            currentUserId = null;
+            // Limpa o ID do SharedPreferences
+            saveUserId(null);
+
+            // Reseta a UI
             pairingCodeEditText.setText("");
             pairingCodeEditText.setEnabled(true);
             pairButton.setEnabled(true);
             pairButton.setText("Parear com o Sistema");
-            resetButton.setVisibility(View.GONE); // <-- 4. ESCONDER O BOTÃO DE RESET
+            resetButton.setVisibility(View.GONE);
+            syncStatusTextView.setText("Aguardando dados do relógio...");
+            syncStatusTextView.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
             Toast.makeText(this, "Pareamento resetado. Pode inserir um novo código.", Toast.LENGTH_LONG).show();
         });
 
+        // --- Lógica de Inicialização ---
+        loadAndDisplayUserId(); // Carrega o ID salvo
+        checkSensorPermission(); // Verifica permissões
 
-
-        checkSensorPermission();
-
-        // Configura o "receptor" para a mensagem do serviço
+        // Configura o "receptor" para as mensagens do serviço
+        // Este receiver agora trata DUAS ações
         syncResultReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent != null && DataLayerListenerService.ACTION_SYNC_RESULT.equals(intent.getAction())) {
+                if (intent == null || intent.getAction() == null) return;
+
+                String action = intent.getAction();
+
+                if (DataLayerListenerService.ACTION_DATA_RECEIVED.equals(action)) {
+                    // Ação 1: Mostrar o JSON bruto recebido
+                    String json = intent.getStringExtra(DataLayerListenerService.EXTRA_JSON_DATA);
+                    if (json != null) {
+                        Log.d(TAG, "Broadcast de DADOS recebido: " + json);
+                        // Exibe o JSON na tela
+                        syncStatusTextView.setText("Dados Brutos Recebidos:\n" + json);
+                        syncStatusTextView.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
+                    }
+                } else if (DataLayerListenerService.ACTION_SYNC_RESULT.equals(action)) {
+                    // Ação 2: Mostrar a mensagem de STATUS (sucesso/falha)
                     boolean success = intent.getBooleanExtra(DataLayerListenerService.EXTRA_SYNC_SUCCESS, false);
                     String message = intent.getStringExtra(DataLayerListenerService.EXTRA_SYNC_MESSAGE);
-                    syncStatusTextView.setText(message);
-                    syncStatusTextView.setTextColor(ContextCompat.getColor(context, success ? android.R.color.darker_gray : android.R.color.holo_red_dark));
+                    if (message != null) {
+                        Log.d(TAG, "Broadcast de STATUS recebido: " + message);
+                        // Exibe o status na tela
+                        syncStatusTextView.setText(message);
+                        syncStatusTextView.setTextColor(ContextCompat.getColor(context, success ? android.R.color.holo_green_dark : android.R.color.holo_red_dark));
+                    }
                 }
             }
         };
     }
 
+    /**
+     * Salva o ID do Usuário no SharedPreferences.
+     * O Service (DataLayerListenerService) lerá este valor.
+     */
+    private void saveUserId(String userId) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (userId != null && !userId.isEmpty()) {
+            editor.putString(KEY_USER_ID, userId);
+            Log.i(TAG, "ID do Usuário salvo: " + userId);
+        } else {
+            editor.remove(KEY_USER_ID); // Remove o ID
+            Log.i(TAG, "ID do Usuário removido.");
+        }
+        editor.apply();
+    }
+
+    /**
+     * Carrega o ID do SharedPreferences e atualiza a UI no início.
+     */
+    private void loadAndDisplayUserId() {
+        String userId = sharedPreferences.getString(KEY_USER_ID, null);
+        if (userId != null && !userId.isEmpty()) {
+            pairingCodeEditText.setText(userId);
+            pairingCodeEditText.setEnabled(false);
+            pairButton.setText("Pareado");
+            pairButton.setEnabled(false);
+            resetButton.setVisibility(View.VISIBLE);
+        } else {
+            // Garante que o estado inicial esteja limpo
+            pairingCodeEditText.setText("");
+            pairingCodeEditText.setEnabled(true);
+            pairButton.setText("Parear com o Sistema");
+            pairButton.setEnabled(true);
+            resetButton.setVisibility(View.GONE);
+            syncStatusTextView.setText("Dispositivo não pareado. Insira o código.");
+            syncStatusTextView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
+        }
+    }
+
+
+    /**
+     * Envia dados FALSOS (mock) para o servidor, usando o ID salvo.
+     */
     private void sendMockDataToServer() {
-        // Verifica se o dispositivo foi pareado antes de enviar
+        // Lê o ID do SharedPreferences
+        String currentUserId = sharedPreferences.getString(KEY_USER_ID, null);
+
         if (currentUserId == null || currentUserId.isEmpty()) {
             Toast.makeText(this, "É necessário parear o dispositivo primeiro!", Toast.LENGTH_LONG).show();
             return;
         }
 
+        // Cria dados mock
         HeartRate mockHeartRate = new HeartRate(75, 85, 120);
         HealthData mockHealthData = new HealthData(500, mockHeartRate);
-
-        // Usa o ID do usuário/código inserido
         ExperimentResult mockResult = new ExperimentResult(
-                this.currentUserId,
+                currentUserId,
                 "Teste direto do App Mobile",
                 "2025-10-17T10:00:00Z",
                 mockHealthData
         );
 
         ApiService apiService = ApiClient.getApiService();
-        Toast.makeText(this, "Enviando dados de teste para o usuário " + this.currentUserId + "...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Enviando dados de teste para o usuário " + currentUserId + "...", Toast.LENGTH_SHORT).show();
 
         apiService.submitExperimentResult(mockResult).enqueue(new Callback<Void>() {
             @Override
@@ -167,14 +248,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        registerReceiver(syncResultReceiver, new IntentFilter(DataLayerListenerService.ACTION_SYNC_RESULT), RECEIVER_NOT_EXPORTED);
+        // CORREÇÃO: Cria um filtro para AMBAS as ações
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DataLayerListenerService.ACTION_SYNC_RESULT);
+        filter.addAction(DataLayerListenerService.ACTION_DATA_RECEIVED);
+
+        // Registra o receiver com o filtro e a flag de segurança
+        registerReceiver(syncResultReceiver, filter, RECEIVER_NOT_EXPORTED);
+        Log.d(TAG, "BroadcastReceiver registrado para 2 ações.");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        // Cancela o registro do receiver
         unregisterReceiver(syncResultReceiver);
+        Log.d(TAG, "BroadcastReceiver cancelado.");
     }
+
+    // --- Métodos de Permissão (sem alteração) ---
 
     private void checkSensorPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED) {
