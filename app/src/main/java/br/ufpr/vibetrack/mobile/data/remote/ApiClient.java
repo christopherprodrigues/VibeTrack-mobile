@@ -7,7 +7,7 @@ public class ApiClient {
 
     // 1. Sua URL base.
     //    IMPORTANTE: Adicionei a barra "/" no final. O Retrofit precisa dela.
-    private static final String BASE_URL = "http://192.168.7.5:8080/";
+    private static final String BASE_URL = "http://192.168.7.3:8080/";
 
     private static Retrofit retrofit = null;
     private static ApiService apiService = null; // Instância do serviço

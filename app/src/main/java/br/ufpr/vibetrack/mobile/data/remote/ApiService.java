@@ -11,7 +11,7 @@ public interface ApiService {
      * Envia os dados de resultado de um experimento para o backend.
      */
     // Corrigindo para o endpoint que parece ser o correto
-    @POST("api/mobile/results")
+    @POST("/api/dados-biometricos/mobile-data")
     Call<Void> submitExperimentResult(@Body ExperimentResult result);
 
 }

@@ -48,4 +48,5 @@ dependencies {
     implementation(libs.play.services.wearable)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
 }
