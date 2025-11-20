@@ -33,7 +33,7 @@ public class DataLayerListenerService extends WearableListenerService {
 
     @Override
     public void onMessageReceived(@NonNull MessageEvent messageEvent) {
-        if (messageEvent.getPath().equals(EXPERIMENT_DATA_PATH)) {
+        if (messageEvent.getPath().equals("/experiment-data")) {
             String json = new String(messageEvent.getData(), StandardCharsets.UTF_8);
             Log.d(TAG, "Mensagem JSON recebida do smartwatch: " + json);
             sendBroadcastMessage("Recebido do relógio: " + json);
@@ -95,6 +95,13 @@ public class DataLayerListenerService extends WearableListenerService {
             }
         });
     }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "DataLayerListenerService criado");
+    }
+
 
     private void sendBroadcastMessage(String message) {
         Intent intent = new Intent(ACTION_SYNC_STATUS);
