@@ -45,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
     private String currentUserId;
     private BroadcastReceiver statusReceiver;
 
+    private TextView txtHeartRate, txtSteps, connectionStatusText;
+    private View pairingLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
         pairButton = findViewById(R.id.pairButton);
         resetButton = findViewById(R.id.resetButton);
         sendMockDataButton = findViewById(R.id.sendMockDataButton);
+        txtHeartRate = findViewById(R.id.txtHeartRate);
+        txtSteps = findViewById(R.id.txtSteps);
+        connectionStatusText = findViewById(R.id.connectionStatusText);
+        pairingLayout = findViewById(R.id.pairingLayout);
 
         prefs = getSharedPreferences("VibeTrackPrefs", MODE_PRIVATE);
         checkPairingStatus();
@@ -68,8 +75,30 @@ public class MainActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if (intent != null && DataLayerListenerService.ACTION_SYNC_STATUS.equals(intent.getAction())) {
                     String message = intent.getStringExtra(DataLayerListenerService.EXTRA_STATUS_MESSAGE);
-                    Log.d(TAG, "Broadcast recebido: " + message);
+
+                    // Atualiza o Log (Terminal)
                     logMessage(message);
+
+                    // Tenta atualizar o Dashboard se for uma mensagem JSON do relógio
+                    if (message.contains("Recebido do relógio:")) {
+                        try {
+                            // Pega só a parte do JSON (depois dos dois pontos)
+                            String jsonPart = message.substring(message.indexOf("{"));
+
+                            // Usa o Gson (você já tem importado) para facilitar a leitura
+                            com.google.gson.Gson gson = new com.google.gson.Gson();
+                            HealthData data = gson.fromJson(jsonPart, HealthData.class);
+
+                            if (data != null) {
+                                txtSteps.setText(String.valueOf(data.getSteps()));
+                                if (data.getHeartRate() != null) {
+                                    txtHeartRate.setText(String.valueOf(data.getHeartRate().getAverage()));
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Erro ao atualizar dashboard: " + e.getMessage());
+                        }
+                    }
                 }
             }
         };
@@ -91,15 +120,21 @@ public class MainActivity extends AppCompatActivity {
     private void checkPairingStatus() {
         currentUserId = prefs.getString(PREF_USER_ID, null);
         if (currentUserId != null) {
-            logMessage("Pareado com ID: " + currentUserId);
-            pairingCodeEditText.setVisibility(View.GONE);
-            pairButton.setVisibility(View.GONE);
+            // PAREADO
+            pairingLayout.setVisibility(View.GONE);
             resetButton.setVisibility(View.VISIBLE);
+
+            connectionStatusText.setText("● Conectado: " + currentUserId);
+            // Usando a cor verde definida no colors.xml
+            connectionStatusText.setTextColor(getResources().getColor(R.color.vibe_status_connected, getTheme()));
         } else {
-            logMessage("Não pareado. Insira o código.");
-            pairingCodeEditText.setVisibility(View.VISIBLE);
-            pairButton.setVisibility(View.VISIBLE);
+            // NÃO PAREADO
+            pairingLayout.setVisibility(View.VISIBLE);
             resetButton.setVisibility(View.GONE);
+
+            connectionStatusText.setText("● Aguardando conexão");
+            // Usando a cor vermelha definida no colors.xml
+            connectionStatusText.setTextColor(getResources().getColor(R.color.vibe_status_disconnected, getTheme()));
         }
     }
 

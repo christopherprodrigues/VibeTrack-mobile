@@ -1,79 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:background="@color/vibe_background"
+    android:padding="24dp"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/permissionStatusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Verificando permissões..."
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-    <Button
-        android:id="@+id/requestPermissionButton"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Solicitar Permissão de Sensores"
-        android:visibility="gone" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="24dp">
 
-    <EditText
-        android:id="@+id/pairingCodeEditText"
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="VibeTrack"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:letterSpacing="-0.02"
+            android:textColor="@color/vibe_text_primary"/>
+
+        <TextView
+            android:id="@+id/connectionStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="● Desconectado"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/vibe_text_secondary"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="Insira o código de pareamento"
-        android:inputType="text" />
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:layout_marginBottom="24dp">
 
-    <Button
-        android:id="@+id/pairButton"
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/white"
+            app:strokeColor="#E0E0E0"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="❤️ BPM"
+                    android:textAllCaps="true"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vibe_text_secondary"/>
+
+                <TextView
+                    android:id="@+id/txtHeartRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vibe_text_primary"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/white"
+            app:strokeColor="#E0E0E0"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👟 Passos"
+                    android:textAllCaps="true"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vibe_text_secondary"/>
+
+                <TextView
+                    android:id="@+id/txtSteps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textSize="36sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vibe_text_primary"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/pairingLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Parear com o Sistema" />
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID do Participante"
+            app:boxStrokeColor="@color/vibe_primary"
+            app:hintTextColor="@color/vibe_primary_dark"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/pairingCodeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/pairButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/vibe_primary"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:text="Conectar"
+            app:cornerRadius="8dp"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/resetButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Resetar Pareamento"
-        android:visibility="gone" />
+        android:layout_height="56dp"
+        android:text="Encerrar Sessão"
+        android:textColor="@color/vibe_status_disconnected"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:strokeColor="@color/vibe_status_disconnected"
+        app:cornerRadius="8dp"
+        android:visibility="gone"
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/sendMockDataButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Enviar Dados de Teste (Mock)" />
+        android:text="Enviar Mock (Teste)"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:textColor="@color/vibe_text_secondary"
+        android:layout_marginTop="8dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Console de Dados:"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textAllCaps="true"
+        android:textColor="@color/vibe_text_secondary"
         android:layout_marginTop="16dp"
-        android:text="Status da Sincronização:"
-        android:textStyle="bold" />
+        android:layout_marginBottom="4dp"/>
 
-    <ScrollView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="8dp"
-        android:background="#f0f0f0"
-        android:padding="8dp">
+        app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/log_background"
+        app:cardElevation="0dp">
 
-        <TextView
-            android:id="@+id/syncStatusTextView"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:text="Aguardando dados do relógio..." />
-    </ScrollView>
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/syncStatusTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                android:textColor="@color/log_text"
+                android:lineSpacingExtra="2dp"
+                android:text="> Sistema VibeTrack iniciado..." />
+        </ScrollView>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
