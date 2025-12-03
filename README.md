@@ -12,7 +12,7 @@ A aplicação atua como um **Gateway IoT** e **Dashboard**, responsável por rec
 * **Monitoramento em Tempo Real:** Exibição dos últimos dados recebidos na interface do usuário.
 * **Modo de Teste (Mock Data):** Funcionalidade para gerar e enviar dados fictícios para validar a integração com o backend sem a necessidade de um relógio físico.
 
-## 🛠 Arquitetura e Tecnologias
+## Arquitetura e Tecnologias
 
 A aplicação foi desenvolvida em **Java** (compatibilidade JDK 1.8) e utiliza as seguintes bibliotecas e componentes:
 
