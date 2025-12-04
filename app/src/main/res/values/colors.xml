@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-</resources>
+
+    <color name="vibe_primary">#FFB300</color> <color name="vibe_primary_dark">#FF8F00</color>
+    <color name="vibe_background">#FAFAFA</color> <color name="vibe_text_primary">#212121</color> <color name="vibe_text_secondary">#757575</color> <color name="vibe_status_connected">#2E7D32</color> <color name="vibe_status_disconnected">#C62828</color> <color name="log_background">#121212</color> <color name="log_text">#FFD54F</color> </resources>
