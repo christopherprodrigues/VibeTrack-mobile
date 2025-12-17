@@ -27,7 +27,22 @@ A aplicação foi desenvolvida em **Java** (compatibilidade JDK 1.8) e utiliza a
 * `data/remote/ApiClient.java`: Configuração do cliente Retrofit (Base URL: `https://vibetrack-473604.web.app/`).
 * `data/model/`: Classes POJO (`ExperimentResult`, `HealthData`, `HeartRate`) que modelam o payload JSON.
 
-## Como Executar
+## Compatibilidade e Distribuição
+
+### Requisitos de Dispositivo
+* **Sistema Operacional:** Android 8.0 (Oreo / API Level 26) ou superior.
+* **Dependências:** Requer **Google Play Services** instalado para comunicação com o Wear OS.
+* **Conectividade:** Bluetooth e Acesso à Internet.
+
+### Como Gerar um Instalador (APK)
+Para instalar o aplicativo em outros dispositivos sem usar a Google Play Store:
+
+1.  No Android Studio, acesse o menu **Build** > **Build Bundle(s) / APK(s)** > **Build APK(s)**.
+2.  Aguarde a compilação. Uma notificação aparecerá com a opção **locate** (localizar).
+3.  O arquivo gerado (`app-debug.apk`) pode ser transferido e instalado em qualquer dispositivo compatível.
+    * *Nota: No dispositivo de destino, pode ser necessário autorizar a instalação de aplicativos de "Fontes Desconhecidas".*
+
+## Como Executar (Desenvolvimento)
 
 1.  Abra este projeto no **Android Studio**.
 2.  Sincronize as dependências do Gradle.
