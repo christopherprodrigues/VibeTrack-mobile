@@ -7,7 +7,7 @@ public class ApiClient {
 
     // 1. Sua URL base.
     //    IMPORTANTE: Adicionei a barra "/" no final. O Retrofit precisa dela.
-    private static final String BASE_URL = "https://vibetrack-473604.web.app/";
+    private static final String BASE_URL = "https://vibetrack-backend-435280224805.southamerica-east1.run.app/";
 
     private static Retrofit retrofit = null;
     private static ApiService apiService = null; // Instância do serviço
